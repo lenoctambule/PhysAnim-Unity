@@ -1,13 +1,11 @@
 # PhysAnim for Unity
 
+<div align="center">
 <img 
-    style="display: block; 
-           margin-left: auto;
-           margin-right: auto;
-           width: 30%;"
     src="Media/ragdoll_gif.gif" 
     alt="Ragdoll gif">
 </img>
+</div>
 
 PhysAnim is a Unity tool that enables physical animations through motor-based and keyframe-based ragdoll pose matching similar to those found in Star Wars: New Order or Uncharted 4.
 
