@@ -11,7 +11,7 @@ PhysAnim is a Unity tool that enables physical animations through motor-based an
 
 ## Goal
 
-Real-Time CGI are now great enough to make the environment, the characters feel almost life-like and allowing blending between physics and animations and overall putting an emphasis on interactions is the last missing piece to create truly immersive experiences. VR/AR or high fidelity applications are crucial as the lack of interactivity (or bugs) can easily break the player's immersion.
+Real-Time CGI are now great enough to make the environment, the characters feel almost life-like and allowing blending between physics and animations and overall putting an emphasis on interactions is the last missing piece to create truly immersive experiences. In VR/AR or high fidelity experiences, interactions are crucial as the lack of interactivity (or bugs) can easily break the player's immersion.
 The goal of PhysAnim is to bridge that last gap.
 
 ## Roadmap
