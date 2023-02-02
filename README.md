@@ -7,7 +7,7 @@
 </img>
 </div>
 
-PhysAnim is a Unity tool that enables physical animations through motor-based and keyframe-based ragdoll pose matching similar to those found in Star Wars: New Order or Uncharted 4.
+PhysAnim is a Unity tool that enables physical animations through motor-based and keyframe-based ragdoll pose matching similar to those found in Star Wars: Fallen Order or Uncharted 4.
 
 ## Goal
 
