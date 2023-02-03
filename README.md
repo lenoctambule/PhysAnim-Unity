@@ -24,6 +24,6 @@ The goal of PhysAnim is to bridge that last gap.
 
 ## Acknowledgments
 
-- Michael Mach's GDC Talk : [Physics Animation in Uncharted 4: A Thief's End](https://www.youtube.com/watch?v=7S-_vuoKgR4)
+- Michal Mach's GDC Talk : [Physics Animation in Uncharted 4: A Thief's End](https://www.youtube.com/watch?v=7S-_vuoKgR4)
 - Bartlomiej Waszak's GDC Talk : [Physical Animation in Star Wars Jedi: Fallen Order](https://www.youtube.com/watch?v=TmAU8aPekEo)
 - Michael Stevenson : For [ConfigurableJointsExtensions.cs](https://gist.github.com/mstevenson/7b85893e8caf5ca034e6)
