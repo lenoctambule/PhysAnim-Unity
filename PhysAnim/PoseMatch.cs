@@ -25,19 +25,6 @@ namespace PhysAnim
         private readonly Dictionary<ConfigurableJoint, Quaternion> _startRotations = new();
         private GameObject _ragdoll;
 
-
-        public void SwitchPhysAnim(bool isPhys)
-        {
-            //profile.Reference.GetComponent<Animator>().enabled = !isPhys;
-            SkinnedMeshRenderer[] ref_renderers = profile.Reference.GetComponentsInChildren<SkinnedMeshRenderer>();
-            SkinnedMeshRenderer[] rag_renderers = _ragdoll.GetComponentsInChildren<SkinnedMeshRenderer>();
-
-            foreach (SkinnedMeshRenderer r in rag_renderers)
-                r.enabled = isPhys;
-            foreach (SkinnedMeshRenderer r in ref_renderers)
-                r.enabled = !isPhys;
-        }
-
         private void ConvertToConfigurableJoint(CharacterJoint j)
         {
             ConfigurableJoint new_j = PhysAnimUtilities.RecursiveFindChild(_ragdoll.transform, j.name).gameObject.AddComponent<ConfigurableJoint>();
@@ -139,7 +126,7 @@ namespace PhysAnim
             Collider[] ref_colliders = profile.Reference.GetComponentsInChildren<Collider>();
             SkinnedMeshRenderer[] ref_renderers = profile.Reference.GetComponentsInChildren<SkinnedMeshRenderer>();
             foreach (Collider c in ref_colliders)
-                Destroy(c);
+                c.enabled = false;
             foreach (SkinnedMeshRenderer r in ref_renderers)
                 r.enabled = false;
         }
@@ -175,28 +162,21 @@ namespace PhysAnim
         {
             if (Physics.sleepThreshold != 0)
                 Debug.Log("The physics simulation sleep threshold is not zero. You may experience glitches.");
-
-            if (_ragdoll == null)
-            {
-                InitRef();
-                InitJoints();
-            }
-            else
-            {
-                foreach (KeyValuePair<Transform, KeyValuePair<ConfigurableJoint, MotorizedJoint>> entry in _jointref_dict)
-                {
-                    Rigidbody rb = entry.Value.Key.GetComponent<Rigidbody>();
-                    rb.MovePosition(entry.Key.position);
-                    rb.MoveRotation(entry.Key.rotation);
-                }
-                rag_state = StateRagdoll.FullyKeyFramed;
-                SwitchPhysAnim(true);
-            }
+            InitRef();
+            InitJoints();
         }
 
         private void OnDisable()
         {
-            SwitchPhysAnim(false);
+            _startRotations.Clear();
+            _jointref_dict.Clear();
+            Collider[] ref_colliders = profile.Reference.GetComponentsInChildren<Collider>();
+            SkinnedMeshRenderer[] ref_renderers = profile.Reference.GetComponentsInChildren<SkinnedMeshRenderer>();
+            foreach (Collider c in ref_colliders)
+                c.enabled = true;
+            foreach (SkinnedMeshRenderer r in ref_renderers)
+                r.enabled = true;
+            Destroy(_ragdoll);
         }
 
         private void StateHandler()
