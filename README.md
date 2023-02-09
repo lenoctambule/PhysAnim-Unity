@@ -19,8 +19,6 @@ The goal of PhysAnim is to bridge that last gap.
 - [X] Local motor-based pose-matching
 - [X] Global keyframe-based pose-matching
 - [X] Physics to regular animation transitioning
-- [ ] Balanced-pose Biped Adjustement
-- [ ] Self-Balancing Biped
 
 ## Acknowledgments
 
