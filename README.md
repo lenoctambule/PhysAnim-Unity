@@ -20,6 +20,19 @@ The goal of PhysAnim is to bridge that last gap.
 - [X] Global keyframe-based pose-matching
 - [X] Physics to regular animation transitioning
 
+## Quickstart Guide
+
+:warning: First, you have to make sure that your animator's culling mode is set to "Always animate" and the update mode to animate physics.
+
+1. Slide the PoseMatch.cs script in any GameObject into the inspector.
+2. Assign into reference the root of the ragdoll you want to animate.
+3. Hit "Auto-detect and add character joints" button to add all the joints to the Motor-driven joints list or add and tweak the strengths manually.
+4. You can also add Keyframe-driven limbs and tweak their stiffness.
+5. You have 3 modes :
+    - **Ragdolling** which will match poses only using the motor-driven joints
+    - **Partially keyframed** which will mix both motor-driven and keyframed driven.
+    - **Fully keyframed** which will match the animation one to one but it is better to just disable the script.
+
 ## Acknowledgments
 
 - Michal Mach's GDC Talk : [Physics Animation in Uncharted 4: A Thief's End](https://www.youtube.com/watch?v=7S-_vuoKgR4)
