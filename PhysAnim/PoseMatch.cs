@@ -55,7 +55,8 @@ namespace PhysAnim
         public Vector3 GetDelta(Transform bone)
         {
 
-            if (profile.KeyFramedJoints.Find(b => b.Limb == bone).Limb != null) throw new System.Exception("The object you're trying to get the Delta from is not a PhysAnimBone");
+            if (profile.KeyFramedJoints.Find(b => b.Limb == bone).Limb != null) 
+                throw new System.Exception("The object you're trying to get the Delta from is not a PhysAnimBone");
             Transform refBone = PhysAnimUtilities.RecursiveFindChild(_ragdoll.transform, bone.name);
             Transform physBone = _jointref_dict[refBone].Key.transform;
 
@@ -82,6 +83,7 @@ namespace PhysAnim
             profile.KeyFramedJoints.ForEach(
                 j =>
                 {
+                    
                     if (j.Limb != null && _jointref_dict.ContainsKey(j.Limb))
                     {
                         Transform refBone = j.Limb;
@@ -115,20 +117,28 @@ namespace PhysAnim
 
         private void InitRef()
         {
+            Animator anim;
+
             if (profile.Reference == null) throw new ArgumentException("No reference provided");
             _ragdoll = Instantiate(profile.Reference, profile.Reference.transform.position, profile.Reference.transform.rotation);
             _ragdoll.transform.SetParent(profile.Reference.transform.parent);
             _ragdoll.transform.position = profile.Reference.transform.position;
-            _ragdoll.name = profile.Reference.name + "_PhysAnim";
-            profile.Reference.GetComponent<Animator>().enabled = true;
-            _ragdoll.GetComponent<Animator>().enabled = false;
+            _ragdoll.name = profile.Reference.name + "_ragdoll";
+            if (profile.Reference.TryGetComponent<Animator>(out anim))
+                anim.enabled = true;
+            if (_ragdoll.TryGetComponent<Animator>(out anim))
+                anim.enabled = true;
 
-            Collider[] ref_colliders = profile.Reference.GetComponentsInChildren<Collider>();
-            SkinnedMeshRenderer[] ref_renderers = profile.Reference.GetComponentsInChildren<SkinnedMeshRenderer>();
-            foreach (Collider c in ref_colliders)
-                c.enabled = false;
-            foreach (SkinnedMeshRenderer r in ref_renderers)
-                r.enabled = false;
+            Transform[] ref_transforms = profile.Reference.GetComponentsInChildren<Transform>();
+            foreach (Transform c in ref_transforms)
+            {
+                if (c.gameObject.TryGetComponent<SkinnedMeshRenderer>(out SkinnedMeshRenderer smr))
+                    smr.enabled = false;
+                if (c.gameObject.TryGetComponent<Collider>(out Collider coll))
+                    coll.enabled = false;
+                if (c.gameObject.TryGetComponent<Rigidbody>(out Rigidbody rb))
+                    rb.isKinematic = true;
+            }
         }
 
         private void InitJoints()
