@@ -25,13 +25,6 @@ namespace PhysAnim
         private readonly Dictionary<ConfigurableJoint, Quaternion> _startRotations = new();
         private GameObject _ragdoll;
 
-        private void ConvertToConfigurableJoint(CharacterJoint j)
-        {
-            ConfigurableJoint new_j = PhysAnimUtilities.RecursiveFindChild(_ragdoll.transform, j.name).gameObject.AddComponent<ConfigurableJoint>();
-            PhysAnimUtilities.ConvertCharJointToConfigurableJoint(j, new_j);
-            Destroy(j);
-        }
-
         public GameObject GetReference()
         {
             return _ragdoll;
@@ -55,8 +48,8 @@ namespace PhysAnim
         public Vector3 GetDelta(Transform bone)
         {
 
-            if (profile.KeyFramedJoints.Find(b => b.Limb == bone).Limb != null) 
-                throw new System.Exception("The object you're trying to get the Delta from is not a PhysAnimBone");
+            if (profile.KeyFramedJoints.Find(b => b.Limb == bone).Limb != null)
+                throw new Exception("The object you're trying to get the Delta from is not a PhysAnimBone");
             Transform refBone = PhysAnimUtilities.RecursiveFindChild(_ragdoll.transform, bone.name);
             Transform physBone = _jointref_dict[refBone].Key.transform;
 
@@ -83,7 +76,7 @@ namespace PhysAnim
             profile.KeyFramedJoints.ForEach(
                 j =>
                 {
-                    
+
                     if (j.Limb != null && _jointref_dict.ContainsKey(j.Limb))
                     {
                         Transform refBone = j.Limb;
@@ -117,26 +110,26 @@ namespace PhysAnim
 
         private void InitRef()
         {
-            Animator anim;
+            Animator    anim;
+            Transform[] ref_transforms = profile.Reference.GetComponentsInChildren<Transform>();
 
             if (profile.Reference == null) throw new ArgumentException("No reference provided");
             _ragdoll = Instantiate(profile.Reference, profile.Reference.transform.position, profile.Reference.transform.rotation);
             _ragdoll.transform.SetParent(profile.Reference.transform.parent);
             _ragdoll.transform.position = profile.Reference.transform.position;
             _ragdoll.name = profile.Reference.name + "_ragdoll";
-            if (profile.Reference.TryGetComponent<Animator>(out anim))
+            if (profile.Reference.TryGetComponent(out anim))
                 anim.enabled = true;
-            if (_ragdoll.TryGetComponent<Animator>(out anim))
+            if (_ragdoll.TryGetComponent(out anim))
                 anim.enabled = true;
 
-            Transform[] ref_transforms = profile.Reference.GetComponentsInChildren<Transform>();
             foreach (Transform c in ref_transforms)
             {
-                if (c.gameObject.TryGetComponent<SkinnedMeshRenderer>(out SkinnedMeshRenderer smr))
+                if (c.gameObject.TryGetComponent(out SkinnedMeshRenderer smr))
                     smr.enabled = false;
-                if (c.gameObject.TryGetComponent<Collider>(out Collider coll))
+                if (c.gameObject.TryGetComponent(out Collider coll))
                     coll.enabled = false;
-                if (c.gameObject.TryGetComponent<Rigidbody>(out Rigidbody rb))
+                if (c.gameObject.TryGetComponent(out Rigidbody rb))
                     rb.isKinematic = true;
             }
         }
@@ -149,13 +142,14 @@ namespace PhysAnim
                     if (j.Joint != null)
                     {
                         Transform ragdoll_clonedjoint = PhysAnimUtilities.RecursiveFindChild(_ragdoll.transform, j.Joint.transform.name);
-                        ConvertToConfigurableJoint(ragdoll_clonedjoint.GetComponent<CharacterJoint>());
                         ragdoll_clonedjoint.GetComponent<Collider>().material = profile.RagdollMaterial;
                         try
                         {
                             _jointref_dict.Add(j.Joint.transform,
                                 new KeyValuePair<ConfigurableJoint, MotorizedJoint>(
-                                    ragdoll_clonedjoint.GetComponent<ConfigurableJoint>(), j));
+                                        ragdoll_clonedjoint.GetComponent<ConfigurableJoint>(), j
+                                    )
+                                );
                         }
                         catch
                         {

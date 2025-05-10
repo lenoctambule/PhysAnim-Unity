@@ -8,10 +8,10 @@ namespace PhysAnim
     public struct MotorizedJoint
     {
         [Range(0, 1)]
-        public float Strength;
-        public CharacterJoint Joint;
+        public float                Strength;
+        public ConfigurableJoint    Joint;
 
-        public MotorizedJoint(float strength, CharacterJoint joint)
+        public MotorizedJoint(float strength, ConfigurableJoint joint)
         {
             this.Strength = strength;
             this.Joint = joint;
@@ -22,8 +22,14 @@ namespace PhysAnim
     public struct KeyframedJoint
     {
         [Range(0, 1)]
-        public float Stiffness;
-        public Transform Limb; 
+        public float        Stiffness;
+        public Transform    Limb;
+
+        public KeyframedJoint(float Stiffness, Transform Limb)
+        {
+            this.Stiffness = Stiffness;
+            this.Limb = Limb;
+        }
     }
 
     [Serializable]
@@ -31,7 +37,7 @@ namespace PhysAnim
     {
         public List<MotorizedJoint> MotorJoints;
         public List<KeyframedJoint> KeyFramedJoints;
-        public PhysicMaterial RagdollMaterial;
-        public GameObject Reference;
+        public PhysicMaterial       RagdollMaterial;
+        public GameObject           Reference;
     }
 }

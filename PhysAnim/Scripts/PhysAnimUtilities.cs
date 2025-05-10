@@ -7,31 +7,29 @@ namespace PhysAnim
 {
     public static class PhysAnimUtilities
     {
-        public static ConfigurableJoint ConvertCharJointToConfigurableJoint(CharacterJoint j, ConfigurableJoint new_j)
+        public static void ConvertCharJointToConfigurableJoint(CharacterJoint char_joint, ref ConfigurableJoint config_joint)
         {
-            new_j.anchor = j.anchor;
-            new_j.connectedAnchor = j.connectedAnchor;
-            new_j.connectedBody = j.connectedBody;
-            new_j.autoConfigureConnectedAnchor = j.autoConfigureConnectedAnchor;
-            new_j.axis = j.axis;
-            new_j.secondaryAxis = j.swingAxis;
-            new_j.lowAngularXLimit = j.lowTwistLimit;
-            new_j.highAngularXLimit = j.highTwistLimit;
-            new_j.angularYLimit = j.swing1Limit;
-            new_j.angularZLimit = j.swing2Limit;
-            new_j.xMotion = ConfigurableJointMotion.Locked;
-            new_j.yMotion = ConfigurableJointMotion.Locked;
-            new_j.zMotion = ConfigurableJointMotion.Locked;
-            new_j.angularXMotion = ConfigurableJointMotion.Limited;
-            new_j.angularYMotion = ConfigurableJointMotion.Limited;
-            new_j.angularZMotion = ConfigurableJointMotion.Limited;
+            config_joint.anchor = char_joint.anchor;
+            config_joint.connectedAnchor = char_joint.connectedAnchor;
+            config_joint.connectedBody = char_joint.connectedBody;
+            config_joint.autoConfigureConnectedAnchor = char_joint.autoConfigureConnectedAnchor;
+            config_joint.axis = char_joint.axis;
+            config_joint.secondaryAxis = char_joint.swingAxis;
+            config_joint.lowAngularXLimit = char_joint.lowTwistLimit;
+            config_joint.highAngularXLimit = char_joint.highTwistLimit;
+            config_joint.angularYLimit = char_joint.swing1Limit;
+            config_joint.angularZLimit = char_joint.swing2Limit;
+            config_joint.xMotion = ConfigurableJointMotion.Locked;
+            config_joint.yMotion = ConfigurableJointMotion.Locked;
+            config_joint.zMotion = ConfigurableJointMotion.Locked;
+            config_joint.angularXMotion = ConfigurableJointMotion.Limited;
+            config_joint.angularYMotion = ConfigurableJointMotion.Limited;
+            config_joint.angularZMotion = ConfigurableJointMotion.Limited;
             JointDrive jointDrive = new();
             jointDrive.positionSpring = 0f;
             jointDrive.maximumForce = float.MaxValue;
-            new_j.slerpDrive = jointDrive;
-            new_j.rotationDriveMode = RotationDriveMode.Slerp;
-
-            return new_j;
+            config_joint.slerpDrive = jointDrive;
+            config_joint.rotationDriveMode = RotationDriveMode.Slerp;
         }
 
         public static JointDrive ModifyJointDrive(float pos_spring, float pos_damp)
@@ -83,6 +81,4 @@ namespace PhysAnim
         }
 
     }
-
-    
 }
