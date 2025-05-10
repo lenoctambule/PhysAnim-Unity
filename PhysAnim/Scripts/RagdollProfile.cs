@@ -11,10 +11,17 @@ namespace PhysAnim
         public float                Strength;
         public ConfigurableJoint    Joint;
 
+        [NonSerialized]
+        public ConfigurableJoint    RagdollJoint;
+        [NonSerialized]
+        public Quaternion           StartRotation;      
+
         public MotorizedJoint(float strength, ConfigurableJoint joint)
         {
-            this.Strength = strength;
-            this.Joint = joint;
+            this.Strength       = strength;
+            this.Joint          = joint;
+            this.RagdollJoint   = null;
+            this.StartRotation  = Quaternion.identity;
         }
     }
 
@@ -22,13 +29,15 @@ namespace PhysAnim
     public struct KeyframedJoint
     {
         [Range(0, 1)]
-        public float        Stiffness;
-        public Transform    Limb;
+        public float                Stiffness;
+        public Transform            Limb;
+        public Transform            RagdollLimb;
 
         public KeyframedJoint(float Stiffness, Transform Limb)
         {
-            this.Stiffness = Stiffness;
-            this.Limb = Limb;
+            this.Stiffness      = Stiffness;
+            this.Limb           = Limb;
+            this.RagdollLimb    = null;
         }
     }
 

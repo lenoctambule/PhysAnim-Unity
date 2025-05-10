@@ -14,15 +14,10 @@ namespace PhysAnim
     public class PoseMatch : MonoBehaviour
     {
         public RagdollProfile profile;
-
         public float MotorDamping;
         public float MotorStrength;
-        [Range(0, 1)]
-        public float KeyframeStiffness;
         public StateRagdoll rag_state;
 
-        private readonly Dictionary<Transform, KeyValuePair<ConfigurableJoint, MotorizedJoint>> _jointref_dict = new();
-        private readonly Dictionary<ConfigurableJoint, Quaternion> _startRotations = new();
         private GameObject _ragdoll;
 
         public GameObject GetReference()
@@ -30,81 +25,56 @@ namespace PhysAnim
             return _ragdoll;
         }
 
-        public Vector3 GetMeanDelta()
-        {
-            Vector3 delta = new(0, 0, 0);
-
-            profile.KeyFramedJoints.ForEach(
-                j =>
-                {
-                    Transform refBone = PhysAnimUtilities.RecursiveFindChild(_ragdoll.transform, j.Limb.name);
-                    Transform physBone = _jointref_dict[refBone].Key.transform;
-                    delta += refBone.position - physBone.position;
-                });
-
-            return delta / profile.KeyFramedJoints.Count;
-        }
-
-        public Vector3 GetDelta(Transform bone)
-        {
-
-            if (profile.KeyFramedJoints.Find(b => b.Limb == bone).Limb != null)
-                throw new Exception("The object you're trying to get the Delta from is not a PhysAnimBone");
-            Transform refBone = PhysAnimUtilities.RecursiveFindChild(_ragdoll.transform, bone.name);
-            Transform physBone = _jointref_dict[refBone].Key.transform;
-
-            return refBone.position - physBone.position;
-        }
-
         private void FullRefMatch()
         {
-            foreach (KeyValuePair<Transform, KeyValuePair<ConfigurableJoint, MotorizedJoint>> entry in _jointref_dict)
+            foreach (KeyframedJoint j in  profile.KeyFramedJoints)
             {
-                Rigidbody j = entry.Value.Key.transform.GetComponent<Rigidbody>();
-                j.isKinematic = false;
+                if (j.Limb != null)
+                {
+                    Debug.Log(j.RagdollLimb);
+                    Rigidbody rb = j.RagdollLimb.GetComponent<Rigidbody>();
+                    Transform refBone = j.Limb;
 
-                Transform r = entry.Key;
-                j.freezeRotation = true;
-                j.velocity = (r.position - j.position) * 50;
-                j.MoveRotation(r.rotation);
+                    rb.isKinematic = false;
+                    rb.freezeRotation = true;
+                    rb.velocity = (refBone.position - rb.position) * 50;
+                    rb.MoveRotation(refBone.rotation);
+                }
             }
         }
 
         private void PartialRefMatch()
         {
             MotorMatch();
-            profile.KeyFramedJoints.ForEach(
-                j =>
+            foreach (KeyframedJoint j in  profile.KeyFramedJoints)
+            {
+                if (j.Limb != null)
                 {
-
-                    if (j.Limb != null && _jointref_dict.ContainsKey(j.Limb))
-                    {
-                        Transform refBone = j.Limb;
-                        Rigidbody rb = _jointref_dict[refBone].Key.transform.GetComponent<Rigidbody>();
-                        Debug.DrawRay(refBone.position, refBone.up * 0.2f, Color.red);
-                        rb.isKinematic = false;
-                        rb.freezeRotation = true;
-                        Vector3 desiredVelocity = (refBone.position - rb.position) / Time.deltaTime;
-                        rb.velocity = rb.velocity * (1.0f - j.Stiffness) + desiredVelocity * j.Stiffness;
-                        rb.MoveRotation(refBone.rotation);
-                    }
-                });
+                    Transform refBone = j.Limb;
+                    Rigidbody rb = j.RagdollLimb.GetComponent<Rigidbody>();
+                    Vector3 desiredVelocity = (refBone.position - rb.position) / Time.deltaTime;
+                    rb.isKinematic = false;
+                    rb.freezeRotation = true;
+                    rb.velocity = rb.velocity * (1.0f - j.Stiffness) + desiredVelocity * j.Stiffness;
+                    rb.MoveRotation(refBone.rotation);
+                }
+        }
         }
 
         private void MotorMatch()
         {
-            foreach (KeyValuePair<Transform, KeyValuePair<ConfigurableJoint, MotorizedJoint>> entry in _jointref_dict)
+            foreach (MotorizedJoint joint in profile.MotorJoints)
             {
-                ConfigurableJoint j = entry.Value.Key;
-                Transform t = entry.Key;
-                Rigidbody rb = j.transform.GetComponent<Rigidbody>();
+                ConfigurableJoint cj    = joint.RagdollJoint;
+                Transform target        = joint.Joint.transform;
+                Rigidbody rb            = cj.transform.GetComponent<Rigidbody>();
 
                 rb.isKinematic = false;
                 rb.freezeRotation = false;
-                j.targetRotation = PhysAnimUtilities.SetTargetRotation(j, t.localRotation, _startRotations[j]);
-                j.slerpDrive = PhysAnimUtilities.ModifyJointDrive(
-                    MotorStrength * profile.MotorJoints.Find(x => x.Joint == entry.Value.Value.Joint).Strength,
-                    MotorDamping * profile.MotorJoints.Find(x => x.Joint == entry.Value.Value.Joint).Strength);//entry.Value.Value.Power);
+                cj.targetRotation = PhysAnimUtilities.SetTargetRotation(cj, target.localRotation, joint.StartRotation);
+                cj.slerpDrive = PhysAnimUtilities.ModifyJointDrive(
+                    MotorStrength * joint.Strength,
+                    MotorDamping * joint.Strength);
             }
         }
 
@@ -113,7 +83,8 @@ namespace PhysAnim
             Animator    anim;
             Transform[] ref_transforms = profile.Reference.GetComponentsInChildren<Transform>();
 
-            if (profile.Reference == null) throw new ArgumentException("No reference provided");
+            if (profile.Reference == null)
+                throw new ArgumentException("No reference provided");
             _ragdoll = Instantiate(profile.Reference, profile.Reference.transform.position, profile.Reference.transform.rotation);
             _ragdoll.transform.SetParent(profile.Reference.transform.parent);
             _ragdoll.transform.position = profile.Reference.transform.position;
@@ -122,7 +93,6 @@ namespace PhysAnim
                 anim.enabled = true;
             if (_ragdoll.TryGetComponent(out anim))
                 anim.enabled = true;
-
             foreach (Transform c in ref_transforms)
             {
                 if (c.gameObject.TryGetComponent(out SkinnedMeshRenderer smr))
@@ -136,30 +106,31 @@ namespace PhysAnim
 
         private void InitJoints()
         {
-            profile.MotorJoints.ForEach(
-                j =>
+            for (int i = 0; i < profile.MotorJoints.Count; i++)
+            {
+                MotorizedJoint j = profile.MotorJoints[i];
+    
+                if (j.Joint != null)
                 {
-                    if (j.Joint != null)
-                    {
-                        Transform ragdoll_clonedjoint = PhysAnimUtilities.RecursiveFindChild(_ragdoll.transform, j.Joint.transform.name);
-                        ragdoll_clonedjoint.GetComponent<Collider>().material = profile.RagdollMaterial;
-                        try
-                        {
-                            _jointref_dict.Add(j.Joint.transform,
-                                new KeyValuePair<ConfigurableJoint, MotorizedJoint>(
-                                        ragdoll_clonedjoint.GetComponent<ConfigurableJoint>(), j
-                                    )
-                                );
-                        }
-                        catch
-                        {
-                            Debug.LogError("No configurable joint found in clone.");
-                        }
-                        _startRotations.Add(ragdoll_clonedjoint.GetComponent<ConfigurableJoint>(), ragdoll_clonedjoint.localRotation);
-                    }
-                    else
-                        Debug.LogWarning("Joint wasn't provided for an element of the list of MotorizedJoint");
-                });
+                    Transform ragdoll_joint = PhysAnimUtilities.RecursiveFindChild(_ragdoll.transform, j.Joint.transform.name);
+                    ragdoll_joint.GetComponent<Collider>().material = profile.RagdollMaterial;
+                    j.RagdollJoint = ragdoll_joint.GetComponent<ConfigurableJoint>();
+                    j.StartRotation = ragdoll_joint.localRotation;
+                    profile.MotorJoints[i] = j;
+                }
+            }
+            for (int i = 0; i < profile.KeyFramedJoints.Count; i++)
+            {
+                KeyframedJoint j = profile.KeyFramedJoints[i];
+
+                if (j.Limb != null)
+                {
+                    Transform ragdoll_limb = PhysAnimUtilities.RecursiveFindChild(_ragdoll.transform, j.Limb.transform.name);
+                    ragdoll_limb.GetComponent<Collider>().material = profile.RagdollMaterial;
+                    j.RagdollLimb = ragdoll_limb.transform;
+                    profile.KeyFramedJoints[i] = j;
+                }
+            }
         }
 
         private void OnEnable()
@@ -172,8 +143,6 @@ namespace PhysAnim
 
         private void OnDisable()
         {
-            _startRotations.Clear();
-            _jointref_dict.Clear();
             Collider[] ref_colliders = profile.Reference.GetComponentsInChildren<Collider>();
             SkinnedMeshRenderer[] ref_renderers = profile.Reference.GetComponentsInChildren<SkinnedMeshRenderer>();
             foreach (Collider c in ref_colliders)
