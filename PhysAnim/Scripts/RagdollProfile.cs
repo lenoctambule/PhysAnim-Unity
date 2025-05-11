@@ -42,7 +42,7 @@ namespace PhysAnim
     }
 
     [Serializable]
-    public struct RagdollProfile
+    public class RagdollProfile
     {
         public List<MotorizedJoint> MotorJoints;
         public List<KeyframedJoint> KeyFramedJoints;

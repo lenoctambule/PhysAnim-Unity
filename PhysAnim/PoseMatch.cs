@@ -57,7 +57,7 @@ namespace PhysAnim
             MotorMatch();
             foreach (KeyframedJoint j in  profile.KeyFramedJoints)
             {
-                if (j.Limb != null && j.Stiffness != 0.0f)
+                if (j.Limb && j.RagdollLimb && j.Stiffness != 0.0f )
                 {
                     Transform refBone = j.Limb;
                     Rigidbody rb = j.RagdollLimb.GetComponent<Rigidbody>();
@@ -122,7 +122,8 @@ namespace PhysAnim
                 if (j.Joint != null)
                 {
                     Transform ragdoll_joint = PhysAnimUtilities.RecursiveFindChild(_ragdoll.transform, j.Joint.transform.name);
-                    ragdoll_joint.GetComponent<Collider>().material = profile.RagdollMaterial;
+                    if (ragdoll_joint.TryGetComponent<Collider>(out var col))
+                        col.material = profile.RagdollMaterial;
                     j.RagdollJoint = ragdoll_joint.GetComponent<ConfigurableJoint>();
                     j.StartRotation = ragdoll_joint.localRotation;
                     profile.MotorJoints[i] = j;
@@ -132,10 +133,13 @@ namespace PhysAnim
             {
                 KeyframedJoint j = profile.KeyFramedJoints[i];
 
-                if (j.Limb != null)
+                if (!j.Limb.TryGetComponent(out Rigidbody rb))
+                    Debug.LogError("Keyframed Joint "+ j.Limb.name + " does not have a Rigid Body");
+                else if (j.Limb != null)
                 {
                     Transform ragdoll_limb = PhysAnimUtilities.RecursiveFindChild(_ragdoll.transform, j.Limb.transform.name);
-                    ragdoll_limb.GetComponent<Collider>().material = profile.RagdollMaterial;
+                    if (ragdoll_limb.TryGetComponent<Collider>(out var col))
+                        col.material = profile.RagdollMaterial;
                     j.RagdollLimb = ragdoll_limb.transform;
                     profile.KeyFramedJoints[i] = j;
                 }
@@ -154,6 +158,7 @@ namespace PhysAnim
         {
             Collider[] ref_colliders = profile.Reference.GetComponentsInChildren<Collider>();
             SkinnedMeshRenderer[] ref_renderers = profile.Reference.GetComponentsInChildren<SkinnedMeshRenderer>();
+
             foreach (Collider c in ref_colliders)
                 c.enabled = true;
             foreach (SkinnedMeshRenderer r in ref_renderers)
