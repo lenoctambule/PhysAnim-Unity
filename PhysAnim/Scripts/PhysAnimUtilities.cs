@@ -34,18 +34,13 @@ namespace PhysAnim
 
         public static JointDrive ModifyJointDrive(float pos_spring, float pos_damp)
         {
-            JointDrive res = new();
-            res.positionSpring = pos_spring;
-            res.maximumForce = float.MaxValue;
-            res.positionDamper = pos_damp;
+            JointDrive res = new()
+            {
+                positionSpring = pos_spring,
+                maximumForce = float.MaxValue,
+                positionDamper = pos_damp
+            };
             return res;
-        }
-
-        public static JointDrive ModifyJointDrive(JointDrive joint, float pos_spring)
-        {
-            joint.positionSpring = pos_spring;
-            joint.maximumForce = float.MaxValue;
-            return joint;
         }
 
         public static Transform RecursiveFindChild(Transform parent, string childName)

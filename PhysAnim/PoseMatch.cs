@@ -31,7 +31,6 @@ namespace PhysAnim
             {
                 if (j.Limb != null)
                 {
-                    Debug.Log(j.RagdollLimb);
                     Rigidbody rb = j.RagdollLimb.GetComponent<Rigidbody>();
                     Transform refBone = j.Limb;
 
@@ -41,6 +40,16 @@ namespace PhysAnim
                     rb.MoveRotation(refBone.rotation);
                 }
             }
+            foreach (MotorizedJoint j in profile.MotorJoints)
+            {
+                    Rigidbody rb = j.RagdollJoint.GetComponent<Rigidbody>();
+                    Transform refBone = j.Joint.transform;
+
+                    rb.isKinematic = false;
+                    rb.freezeRotation = true;
+                    rb.velocity = (refBone.position - rb.position) * 50;
+                    rb.MoveRotation(refBone.rotation);
+            }
         }
 
         private void PartialRefMatch()
@@ -48,7 +57,7 @@ namespace PhysAnim
             MotorMatch();
             foreach (KeyframedJoint j in  profile.KeyFramedJoints)
             {
-                if (j.Limb != null)
+                if (j.Limb != null && j.Stiffness != 0.0f)
                 {
                     Transform refBone = j.Limb;
                     Rigidbody rb = j.RagdollLimb.GetComponent<Rigidbody>();
