@@ -1,11 +1,12 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 namespace PhysAnim
 {
     [Serializable]
-    public struct MotorizedJoint
+    public class MotorizedJoint
     {
         [Range(0, 1)]
         public float                Strength;
@@ -26,7 +27,7 @@ namespace PhysAnim
     }
 
     [Serializable]
-    public struct KeyframedJoint
+    public class KeyframedJoint
     {
         [Range(0, 1)]
         public float                Stiffness;

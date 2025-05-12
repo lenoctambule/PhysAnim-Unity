@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Assertions;
 
 namespace PhysAnim
 {
@@ -13,16 +14,27 @@ namespace PhysAnim
 
     public class PoseMatch : MonoBehaviour
     {
-        public RagdollProfile profile;
+
         public float MotorDamping;
         public float MotorStrength;
         public StateRagdoll rag_state;
+        [SerializeField]
+        public RagdollProfile profile;
 
         private GameObject _ragdoll;
+        private Dictionary<Transform, MotorizedJoint> _cached_mjoints = new();
+        private Dictionary<Transform, KeyframedJoint> _cached_kjoints = new();
 
-        public GameObject GetReference()
-        {
+        public GameObject GetReference() {
             return _ragdoll;
+        }
+
+        public MotorizedJoint getMotorizedJoint(Transform obj) {
+            return _cached_mjoints[obj];
+        }
+
+        public KeyframedJoint getKeyframeJoint(Transform obj) {
+            return _cached_kjoints[obj];
         }
 
         private void FullRefMatch()
@@ -42,13 +54,13 @@ namespace PhysAnim
             }
             foreach (MotorizedJoint j in profile.MotorJoints)
             {
-                    Rigidbody rb = j.RagdollJoint.GetComponent<Rigidbody>();
-                    Transform refBone = j.Joint.transform;
+                Rigidbody rb = j.RagdollJoint.GetComponent<Rigidbody>();
+                Transform refBone = j.Joint.transform;
 
-                    rb.isKinematic = false;
-                    rb.freezeRotation = true;
-                    rb.velocity = (refBone.position - rb.position) * 50;
-                    rb.MoveRotation(refBone.rotation);
+                rb.isKinematic = false;
+                rb.freezeRotation = true;
+                rb.velocity = (refBone.position - rb.position) * 50;
+                rb.MoveRotation(refBone.rotation);
             }
         }
 
@@ -67,7 +79,7 @@ namespace PhysAnim
                     rb.velocity = rb.velocity * (1.0f - j.Stiffness) + desiredVelocity * j.Stiffness;
                     rb.MoveRotation(refBone.rotation);
                 }
-        }
+            }
         }
 
         private void MotorMatch()
@@ -101,7 +113,7 @@ namespace PhysAnim
             if (profile.Reference.TryGetComponent(out anim))
                 anim.enabled = true;
             if (_ragdoll.TryGetComponent(out anim))
-                anim.enabled = true;
+                anim.enabled = false;
             foreach (Transform c in ref_transforms)
             {
                 if (c.gameObject.TryGetComponent(out SkinnedMeshRenderer smr))
@@ -126,7 +138,7 @@ namespace PhysAnim
                         col.material = profile.RagdollMaterial;
                     j.RagdollJoint = ragdoll_joint.GetComponent<ConfigurableJoint>();
                     j.StartRotation = ragdoll_joint.localRotation;
-                    profile.MotorJoints[i] = j;
+                    _cached_mjoints[j.Joint.transform] = j;
                 }
             }
             for (int i = 0; i < profile.KeyFramedJoints.Count; i++)
@@ -141,7 +153,7 @@ namespace PhysAnim
                     if (ragdoll_limb.TryGetComponent<Collider>(out var col))
                         col.material = profile.RagdollMaterial;
                     j.RagdollLimb = ragdoll_limb.transform;
-                    profile.KeyFramedJoints[i] = j;
+                    _cached_kjoints[j.Limb.transform] = j;
                 }
             }
         }
