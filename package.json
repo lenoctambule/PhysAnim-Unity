@@ -1,0 +1,21 @@
+{
+  "name": "dev.lenoctambule.physanim",
+  "version": "0.0.1",
+  "displayName": "PhysAnim",
+  "description": "Quick physics animations for Unity",
+  "unity": "2022.3",
+  "documentationUrl": "https://github.com/lenoctambule/PhysAnim-Unity/blob/main/README.md",
+  "changelogUrl": "https://github.com/lenoctambule/PhysAnim-Unity/commits/main/",
+  "licensesUrl": "https://raw.githubusercontent.com/lenoctambule/PhysAnim-Unity/refs/heads/main/LICENSE",
+  "dependencies": {
+ },
+ "keywords": [
+    "physics",
+    "animation"
+  ],
+  "author": {
+    "name": "Lenoctambule",
+    "email": "106790775+lenoctambule@users.noreply.github.com",
+    "url": "https://lenoctambule.dev/"
+  }
+}

@@ -2,7 +2,6 @@ using System;
 using UnityEngine;
 using UnityEditor;
 
-
 namespace PhysAnim
 {
     [CustomEditor(typeof(PoseMatch))]

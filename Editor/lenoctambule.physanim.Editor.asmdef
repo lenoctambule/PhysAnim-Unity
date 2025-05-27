@@ -1,0 +1,16 @@
+{
+    "name": "lenoctambule.physanim.Editor",
+    "rootNamespace": "",
+    "references": [
+        "lenoctambule.physanim"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

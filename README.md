@@ -2,7 +2,7 @@
 
 <div align="center">
 <img 
-    src="Media/ragdoll_gif.gif" 
+    src="Media~/ragdoll_gif.gif" 
     alt="Ragdoll gif">
 </img>
 </div>
