@@ -178,6 +178,19 @@ namespace PhysAnim
             Destroy(_ragdoll);
         }
 
+        private void OnValidate()
+        {
+            for (Transform p = this.transform; p && profile.Reference; p = p.parent)
+            {
+                if (profile.Reference.transform == p)
+                {
+                    profile.Reference = null;
+                    Debug.LogError("Reference can't be self or one of parents.");
+                    break;
+                }
+            }
+        }
+
         private void StateHandler()
         {
             switch (rag_state)
