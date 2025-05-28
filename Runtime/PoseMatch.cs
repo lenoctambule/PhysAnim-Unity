@@ -161,13 +161,20 @@ namespace PhysAnim
         private void OnEnable()
         {
             if (Physics.sleepThreshold != 0)
-                Debug.Log("The physics simulation sleep threshold is not zero. You may experience glitches.");
-            InitRef();
-            InitJoints();
+                Debug.LogWarning("The physics simulation sleep threshold is not zero. You may experience glitches.");
+            if (profile.Reference)
+            {
+                InitRef();
+                InitJoints();
+            }
+            else
+                Debug.LogError(this + ": Reference is unassigned.");
         }
 
         private void OnDisable()
         {
+            if (!profile.Reference)
+                return;
             Collider[] ref_colliders = profile.Reference.GetComponentsInChildren<Collider>();
             SkinnedMeshRenderer[] ref_renderers = profile.Reference.GetComponentsInChildren<SkinnedMeshRenderer>();
 
@@ -209,7 +216,8 @@ namespace PhysAnim
 
         private void FixedUpdate()
         {
-            StateHandler();
+            if (profile.Reference)
+                StateHandler();
         }
     }
 }
