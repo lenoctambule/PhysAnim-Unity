@@ -34,7 +34,6 @@ To add package to your project, you need to :
 There are 3 modes :
     - **Ragdolling** which will match poses only using the motor-driven joints
     - **Partially keyframed** which will mix both motor-driven and keyframed driven.
-    - **Fully keyframed** which will match the animation one to one (but it is better to just disable the script).
 
 ## Acknowledgments
 
