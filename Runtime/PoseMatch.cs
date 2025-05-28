@@ -8,7 +8,6 @@ namespace PhysAnim
     public enum StateRagdoll
     {
         Ragdolling,
-        FullyKeyFramed,
         PartiallyKeyFramed,
     }
 
@@ -37,36 +36,8 @@ namespace PhysAnim
             return _cached_kjoints[obj];
         }
 
-        private void FullRefMatch()
-        {
-            foreach (KeyframedJoint j in  profile.KeyFramedJoints)
-            {
-                if (j.Limb != null)
-                {
-                    Rigidbody rb = j.RagdollLimb.GetComponent<Rigidbody>();
-                    Transform refBone = j.Limb;
-
-                    rb.isKinematic = false;
-                    rb.freezeRotation = true;
-                    rb.velocity = (refBone.position - rb.position) * 50;
-                    rb.MoveRotation(refBone.rotation);
-                }
-            }
-            foreach (MotorizedJoint j in profile.MotorJoints)
-            {
-                Rigidbody rb = j.RagdollJoint.GetComponent<Rigidbody>();
-                Transform refBone = j.Joint.transform;
-
-                rb.isKinematic = false;
-                rb.freezeRotation = true;
-                rb.velocity = (refBone.position - rb.position) * 50;
-                rb.MoveRotation(refBone.rotation);
-            }
-        }
-
         private void PartialRefMatch()
         {
-            MotorMatch();
             foreach (KeyframedJoint j in  profile.KeyFramedJoints)
             {
                 if (j.Limb && j.RagdollLimb && j.Stiffness != 0.0f )
@@ -205,10 +176,8 @@ namespace PhysAnim
                 case StateRagdoll.Ragdolling:
                     MotorMatch();
                     break;
-                case StateRagdoll.FullyKeyFramed:
-                    FullRefMatch();
-                    break;
                 case StateRagdoll.PartiallyKeyFramed:
+                    MotorMatch();
                     PartialRefMatch();
                     break;
             }

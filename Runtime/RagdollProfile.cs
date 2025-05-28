@@ -32,6 +32,7 @@ namespace PhysAnim
         [Range(0, 1)]
         public float                Stiffness;
         public Transform            Limb;
+        [NonSerialized]
         public Transform            RagdollLimb;
 
         public KeyframedJoint(float Stiffness, Transform Limb)
