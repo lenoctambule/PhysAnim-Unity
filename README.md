@@ -1,18 +1,21 @@
-# PhysAnim for Unity
+<div align="center">
+<img 
+    src="Media~/logo-light.png" 
+    alt="Logo"
+    height="200px">
+
+</img>
+<span style="font-size: 2rem; font-weight: bold;" > PhysAnim For Unity </span>
+</div>
+
+PhysAnim is a Unity tool that enables physical animations through motor-based and keyframe-based ragdoll pose matching.
 
 <div align="center">
 <img 
-    src="Media~/ragdoll_gif.gif" 
+    src="Media~/ragdoll.gif" 
     alt="Ragdoll gif">
 </img>
 </div>
-
-PhysAnim is a Unity tool that enables physical animations through motor-based and keyframe-based ragdoll pose matching similar to those found in Star Wars: Fallen Order or Uncharted 4.
-
-## Goal
-
-Real-Time CGI are now great enough to make the environment, the characters feel almost life-like and allowing blending between physics and animations and overall putting an emphasis on interactions is the last missing piece to create truly immersive experiences. In VR/AR or high fidelity experiences, interactions are crucial as the lack of interactivity (or bugs) can easily break the player's immersion.
-The goal of PhysAnim is to bridge that last gap.
 
 ## Quickstart Guide
 
