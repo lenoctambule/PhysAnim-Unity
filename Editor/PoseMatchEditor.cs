@@ -7,16 +7,17 @@ namespace PhysAnim
     [CustomEditor(typeof(PoseMatch))]
     public class PoseMatchEditor : Editor
     {
-        SerializedProperty profile;
-        SerializedProperty MotorDamping;
+        SerializedProperty Profile;
+        SerializedProperty Damping;
         SerializedProperty MotorStrength;
-        SerializedProperty rag_state;
+        SerializedProperty State;
+
         private void OnEnable()
         {
-            profile = serializedObject.FindProperty("profile");
-            MotorDamping = serializedObject.FindProperty("MotorDamping");
+            Profile = serializedObject.FindProperty("Profile");
+            Damping = serializedObject.FindProperty("Damping");
             MotorStrength = serializedObject.FindProperty("MotorStrength");
-            rag_state = serializedObject.FindProperty("rag_state");
+            State = serializedObject.FindProperty("State");
         }
 
         public override void OnInspectorGUI()
@@ -27,32 +28,31 @@ namespace PhysAnim
                 return;
             if (GUILayout.Button("Convert character joints to configurable joints"))
             {
-                if (poseMatch.profile.Reference == null)
+                if (poseMatch.Profile.Reference == null)
                     throw new ArgumentException("Character joints can't be detected because the Reference's Root is not defined");
-                CharacterJoint[] char_joints = poseMatch.profile.Reference.transform.GetComponentsInChildren<CharacterJoint>();
+                CharacterJoint[] char_joints = poseMatch.Profile.Reference.transform.GetComponentsInChildren<CharacterJoint>();
                 foreach (CharacterJoint cj in char_joints)
                 {
-                    ConfigurableJoint new_j = PhysAnimUtilities.RecursiveFindChild(poseMatch.profile.Reference.transform, cj.name).gameObject.AddComponent<ConfigurableJoint>();
+                    ConfigurableJoint new_j = PhysAnimUtilities.RecursiveFindChild(poseMatch.Profile.Reference.transform, cj.name).gameObject.AddComponent<ConfigurableJoint>();
                     PhysAnimUtilities.ConvertCharJointToConfigurableJoint(cj, ref new_j);
                     DestroyImmediate(cj);
                 }
             }
             if (GUILayout.Button("Auto-add joints"))
             {
-                if (poseMatch.profile.Reference == null)
+                if (poseMatch.Profile.Reference == null)
                     throw new ArgumentException("Character joints can't be detected because the Reference's Root is not defined");
-                ConfigurableJoint[] joints = poseMatch.profile.Reference.transform.GetComponentsInChildren<ConfigurableJoint>();
+                ConfigurableJoint[] joints = poseMatch.Profile.Reference.transform.GetComponentsInChildren<ConfigurableJoint>();
                 foreach (ConfigurableJoint j in joints)
                 {
-                    poseMatch.profile.MotorJoints.Add(new MotorizedJoint(1.0f, j));
-                    poseMatch.profile.KeyFramedJoints.Add(new KeyframedJoint(1.0f, j.transform));
+                    poseMatch.Profile.MotorJoints.Add(new MotorizedJoint(1000.0f, j));
+                    poseMatch.Profile.KeyFramedJoints.Add(new KeyframedJoint(1.0f, j.transform));
                 }
             }
             serializedObject.Update();
-            EditorGUILayout.PropertyField(profile);
-            EditorGUILayout.PropertyField(MotorDamping);
-            EditorGUILayout.PropertyField(MotorStrength);
-            EditorGUILayout.PropertyField(rag_state);
+            EditorGUILayout.PropertyField(Profile);
+            EditorGUILayout.PropertyField(Damping);
+            EditorGUILayout.PropertyField(State);
             serializedObject.ApplyModifiedProperties();
         }
     }

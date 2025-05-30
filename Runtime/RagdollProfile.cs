@@ -8,7 +8,6 @@ namespace PhysAnim
     [Serializable]
     public class MotorizedJoint
     {
-        [Range(0, 1)]
         public float                Strength;
         public ConfigurableJoint    Joint;
 
