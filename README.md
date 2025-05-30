@@ -6,8 +6,10 @@
 
 </img>
 </div>
+<h2 align="center">
+PhysAnim For Unity
+</h2>
 
-## PhysAnim For Unity
 PhysAnim is a Unity tool that enables physical animations through motor-based and keyframe-based ragdoll pose matching.
 
 <div align="center">
