@@ -36,9 +36,10 @@ To add package to your project, you need to :
 3. Hit "Auto-detect and add character joints" button to add all the joints to the Motor and Keyframed joints lists or/and add them manually.
 4. Tweak the settings to your liking.
 
-There are 3 modes :
-    - **Ragdolling** which will match poses only using the motor-driven joints
-    - **Partially keyframed** which will mix both motor-driven and keyframed driven.
+There are 2 modes :
+
+- **Ragdolling** which will match poses only using the motor-driven joints
+- **Partially keyframed** which will mix both motor-driven and keyframed driven.
 
 ## Acknowledgments
 
