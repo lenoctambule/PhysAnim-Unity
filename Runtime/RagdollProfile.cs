@@ -49,5 +49,25 @@ namespace PhysAnim
         public List<KeyframedJoint> KeyFramedJoints;
         public PhysicMaterial       RagdollMaterial;
         public GameObject           Reference;
+
+        public bool AddMotor(MotorizedJoint mj) {
+            foreach (MotorizedJoint j in MotorJoints)
+            {
+                if (j.Joint.transform == mj.Joint.transform)
+                    return false;
+            }
+            MotorJoints.Add(mj);
+            return true;
+        }
+
+        public bool AddKeyframedJoint(KeyframedJoint kj) {
+            foreach (KeyframedJoint j in KeyFramedJoints)
+            {
+                if (j.Limb == kj.Limb)
+                    return false;
+            }
+            KeyFramedJoints.Add(kj);
+            return true;
+        }
     }
 }

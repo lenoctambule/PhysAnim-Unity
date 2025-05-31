@@ -45,8 +45,8 @@ namespace PhysAnim
                 ConfigurableJoint[] joints = poseMatch.Profile.Reference.transform.GetComponentsInChildren<ConfigurableJoint>();
                 foreach (ConfigurableJoint j in joints)
                 {
-                    poseMatch.Profile.MotorJoints.Add(new MotorizedJoint(1000.0f, j));
-                    poseMatch.Profile.KeyFramedJoints.Add(new KeyframedJoint(1.0f, j.transform));
+                    poseMatch.Profile.AddMotor(new MotorizedJoint(1000.0f, j));
+                    poseMatch.Profile.AddKeyframedJoint(new KeyframedJoint(1.0f, j.transform));
                 }
             }
             serializedObject.Update();
