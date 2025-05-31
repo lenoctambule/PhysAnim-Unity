@@ -14,25 +14,14 @@ namespace PhysAnim
     public class PoseMatch : MonoBehaviour
     {
 
-        public float Damping;
         public StateRagdoll State;
         [SerializeField]
         public RagdollProfile Profile;
-
+        public GameObject Reference;
         private GameObject _ragdoll;
-        private Dictionary<Transform, MotorizedJoint> _cached_mjoints = new();
-        private Dictionary<Transform, KeyframedJoint> _cached_kjoints = new();
 
-        public GameObject GetReference() {
+        public GameObject GetRagdoll() {
             return _ragdoll;
-        }
-
-        public MotorizedJoint getMotorizedJoint(Transform obj) {
-            return _cached_mjoints[obj];
-        }
-
-        public KeyframedJoint getKeyframeJoint(Transform obj) {
-            return _cached_kjoints[obj];
         }
 
         private void PartialRefMatch()
@@ -65,22 +54,22 @@ namespace PhysAnim
                 cj.targetRotation = PhysAnimUtilities.SetTargetRotation(cj, target.localRotation, joint.StartRotation);
                 cj.slerpDrive = PhysAnimUtilities.ModifyJointDrive(
                     joint.Strength,
-                    Damping);
+                    Profile.Damping);
             }
         }
 
         private void InitRef()
         {
             Animator    anim;
-            Transform[] ref_transforms = Profile.Reference.GetComponentsInChildren<Transform>();
+            Transform[] ref_transforms = Reference.GetComponentsInChildren<Transform>();
 
-            if (Profile.Reference == null)
+            if (Reference == null)
                 throw new ArgumentException("No reference provided");
-            _ragdoll = Instantiate(Profile.Reference, Profile.Reference.transform.position, Profile.Reference.transform.rotation);
-            _ragdoll.transform.SetParent(Profile.Reference.transform.parent);
-            _ragdoll.transform.position = Profile.Reference.transform.position;
-            _ragdoll.name = Profile.Reference.name + "_ragdoll";
-            if (Profile.Reference.TryGetComponent(out anim))
+            _ragdoll = Instantiate(Reference, Reference.transform.position, Reference.transform.rotation);
+            _ragdoll.transform.SetParent(Reference.transform.parent);
+            _ragdoll.transform.position = Reference.transform.position;
+            _ragdoll.name = Reference.name + "_ragdoll";
+            if (Reference.TryGetComponent(out anim))
                 anim.enabled = true;
             if (_ragdoll.TryGetComponent(out anim))
                 anim.enabled = false;
@@ -95,59 +84,25 @@ namespace PhysAnim
             }
         }
 
-        private void InitJoints()
-        {
-            for (int i = 0; i < Profile.MotorJoints.Count; i++)
-            {
-                MotorizedJoint j = Profile.MotorJoints[i];
-    
-                if (j.Joint != null)
-                {
-                    Transform ragdoll_joint = PhysAnimUtilities.RecursiveFindChild(_ragdoll.transform, j.Joint.transform.name);
-                    if (ragdoll_joint.TryGetComponent<Collider>(out var col))
-                        col.material = Profile.RagdollMaterial;
-                    j.RagdollJoint = ragdoll_joint.GetComponent<ConfigurableJoint>();
-                    j.StartRotation = ragdoll_joint.localRotation;
-                    _cached_mjoints[j.Joint.transform] = j;
-                }
-            }
-            for (int i = 0; i < Profile.KeyFramedJoints.Count; i++)
-            {
-                KeyframedJoint j = Profile.KeyFramedJoints[i];
-
-                if (!j.Limb.TryGetComponent(out Rigidbody rb))
-                    Debug.LogError("Keyframed Joint "+ j.Limb.name + " does not have a Rigid Body");
-                else if (j.Limb != null)
-                {
-                    Transform ragdoll_limb = PhysAnimUtilities.RecursiveFindChild(_ragdoll.transform, j.Limb.transform.name);
-                    if (ragdoll_limb.TryGetComponent<Collider>(out var col))
-                        col.material = Profile.RagdollMaterial;
-                    j.RagdollLimb = ragdoll_limb.transform;
-                    _cached_kjoints[j.Limb.transform] = j;
-                }
-            }
-        }
-
         private void OnEnable()
         {
             if (Physics.sleepThreshold != 0)
                 Debug.LogWarning("The physics simulation sleep threshold is not zero. You may experience glitches.");
-            if (Profile.Reference)
+            if (Reference)
             {
                 InitRef();
-                InitJoints();
+                Profile.Enable();
             }
             else
                 Debug.LogError(this + ": Reference is unassigned.");
+
         }
 
-        private void OnDisable()
-        {
-            if (!Profile.Reference)
+        private void OnDisable() {
+            if (!Reference)
                 return;
-            Collider[] ref_colliders = Profile.Reference.GetComponentsInChildren<Collider>();
-            SkinnedMeshRenderer[] ref_renderers = Profile.Reference.GetComponentsInChildren<SkinnedMeshRenderer>();
-
+            Collider[] ref_colliders = Reference.GetComponentsInChildren<Collider>();
+            SkinnedMeshRenderer[] ref_renderers = Reference.GetComponentsInChildren<SkinnedMeshRenderer>();
             foreach (Collider c in ref_colliders)
                 c.enabled = true;
             foreach (SkinnedMeshRenderer r in ref_renderers)
@@ -157,11 +112,11 @@ namespace PhysAnim
 
         private void OnValidate()
         {
-            for (Transform p = this.transform; p && Profile.Reference; p = p.parent)
+            for (Transform p = this.transform; p && Reference; p = p.parent)
             {
-                if (Profile.Reference.transform == p)
+                if (Reference.transform == p)
                 {
-                    Profile.Reference = null;
+                    Reference = null;
                     Debug.LogError("Reference can't be self or one of parents.");
                     break;
                 }
@@ -184,7 +139,7 @@ namespace PhysAnim
 
         private void FixedUpdate()
         {
-            if (Profile.Reference)
+            if (Reference)
                 StateHandler();
         }
     }

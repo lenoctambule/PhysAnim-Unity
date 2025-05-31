@@ -31,7 +31,7 @@ namespace PhysAnim
         [Range(0, 1)]
         public float                Stiffness;
         public Transform            Limb;
-        [NonSerialized]
+        // [NonSerialized]
         public Transform            RagdollLimb;
 
         public KeyframedJoint(float Stiffness, Transform Limb)
@@ -42,15 +42,18 @@ namespace PhysAnim
         }
     }
 
-    [Serializable]
-    public class RagdollProfile
+    public class RagdollProfile : MonoBehaviour
     {
         public List<MotorizedJoint> MotorJoints;
         public List<KeyframedJoint> KeyFramedJoints;
         public PhysicMaterial       RagdollMaterial;
-        public GameObject           Reference;
+        public float                Damping;
+        public PoseMatch            PoseMatch;
 
-        public bool AddMotor(MotorizedJoint mj) {
+        private Dictionary<Transform, MotorizedJoint> _cached_mjoints = new();
+        private Dictionary<Transform, KeyframedJoint> _cached_kjoints = new();
+
+        public bool Add(MotorizedJoint mj) {
             foreach (MotorizedJoint j in MotorJoints)
             {
                 if (j.Joint.transform == mj.Joint.transform)
@@ -60,7 +63,7 @@ namespace PhysAnim
             return true;
         }
 
-        public bool AddKeyframedJoint(KeyframedJoint kj) {
+        public bool Add(KeyframedJoint kj) {
             foreach (KeyframedJoint j in KeyFramedJoints)
             {
                 if (j.Limb == kj.Limb)
@@ -68,6 +71,49 @@ namespace PhysAnim
             }
             KeyFramedJoints.Add(kj);
             return true;
+        }
+
+        public MotorizedJoint getMotorizedJoint(Transform obj) {
+            return _cached_mjoints[obj];
+        }
+
+        public KeyframedJoint getKeyframeJoint(Transform obj) {
+            return _cached_kjoints[obj];
+        }
+
+        public void Enable() {
+            InitJoints();
+        }
+
+        private void InitJoints()
+        {
+            Transform ragdoll = PoseMatch.GetRagdoll().transform;
+
+            foreach(MotorizedJoint j in MotorJoints)
+            {    
+                if (j.Joint != null)
+                {
+                    Transform ragdoll_joint = PhysAnimUtilities.RecursiveFindChild(ragdoll, j.Joint.transform.name);
+                    if (ragdoll_joint.TryGetComponent<Collider>(out var col))
+                        col.material = RagdollMaterial;
+                    j.RagdollJoint = ragdoll_joint.GetComponent<ConfigurableJoint>();
+                    j.StartRotation = ragdoll_joint.localRotation;
+                    _cached_mjoints[j.Joint.transform] = j;
+                }
+            }
+            foreach(KeyframedJoint j in KeyFramedJoints)
+            {
+                if (!j.Limb.TryGetComponent(out Rigidbody rb))
+                    Debug.LogError("Keyframed Joint "+ j.Limb.name + " does not have a Rigid Body");
+                else if (j.Limb != null)
+                {
+                    Transform ragdoll_limb = PhysAnimUtilities.RecursiveFindChild(PoseMatch.GetRagdoll().transform, j.Limb.transform.name);
+                    if (ragdoll_limb.TryGetComponent<Collider>(out var col))
+                        col.material = RagdollMaterial;
+                    j.RagdollLimb = ragdoll_limb.transform;
+                    _cached_kjoints[j.Limb.transform] = j;
+                }
+            }
         }
     }
 }
