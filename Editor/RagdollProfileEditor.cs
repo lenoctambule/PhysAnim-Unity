@@ -8,8 +8,7 @@ namespace PhysAnim
     [CustomEditor(typeof(RagdollProfile))]
     public class RagdollProfileEditor : Editor
     {
-        SerializedProperty MotorJoints;
-        SerializedProperty KeyFramedJoints;
+        SerializedProperty Joints;
         SerializedProperty PoseMatch;
         SerializedProperty Damping;
         RagdollProfile     Profile;
@@ -18,9 +17,8 @@ namespace PhysAnim
         {
             Profile = (RagdollProfile)target;
 
+            Joints = serializedObject.FindProperty("Joints");
             PoseMatch = serializedObject.FindProperty("PoseMatch");
-            MotorJoints = serializedObject.FindProperty("MotorJoints");
-            KeyFramedJoints = serializedObject.FindProperty("KeyFramedJoints");
             Damping = serializedObject.FindProperty("Damping");
             if (Profile.transform.TryGetComponent(out PoseMatch ps))
                 Profile.PoseMatch = ps;
@@ -47,15 +45,11 @@ namespace PhysAnim
                     throw new ArgumentException("Character joints can't be detected because the Reference's Root is not defined");
                 ConfigurableJoint[] joints = Profile.PoseMatch.Reference.transform.GetComponentsInChildren<ConfigurableJoint>();
                 foreach (ConfigurableJoint j in joints)
-                {
-                    Profile.Add(new MotorizedJoint(1000.0f, j));
-                    Profile.Add(new KeyframedJoint(1.0f, j.transform));
-                }
+                    Profile.Add(new Joint(j));
             }
-            EditorGUILayout.PropertyField(MotorJoints);
-            EditorGUILayout.PropertyField(KeyFramedJoints);
-            EditorGUILayout.PropertyField(Damping);
             EditorGUILayout.PropertyField(PoseMatch);
+            EditorGUILayout.PropertyField(Damping);
+            EditorGUILayout.PropertyField(Joints);
             serializedObject.ApplyModifiedProperties();
         }
     }

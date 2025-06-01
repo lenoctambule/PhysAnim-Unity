@@ -15,7 +15,6 @@ namespace PhysAnim
     [AddComponentMenu("PhysAnim/Pose Match")]
     public class PoseMatch : MonoBehaviour
     {
-        public StateRagdoll State;
         public GameObject Reference;
 
         private GameObject _ragdoll;
@@ -31,38 +30,6 @@ namespace PhysAnim
 
         public GameObject GetRagdoll() {
             return _ragdoll;
-        }
-
-        private void GlobalMatch()
-        {
-            foreach (KeyframedJoint j in  _profile.KeyFramedJoints)
-            {
-                if (j.Limb && j.RagdollLimb && j.Stiffness != 0.0f )
-                {
-                    Transform refBone = j.Limb;
-                    Rigidbody rb = j.RagdollLimb.GetComponent<Rigidbody>();
-                    Vector3 desiredVelocity = (refBone.position - rb.position) / Time.deltaTime;
-                    rb.isKinematic = false;
-                    rb.freezeRotation = true;
-                    rb.velocity = rb.velocity * (1.0f - j.Stiffness) + desiredVelocity * j.Stiffness;
-                    rb.MoveRotation(refBone.rotation);
-                }
-            }
-        }
-
-        private void LocalMatch()
-        {
-            foreach (MotorizedJoint joint in _profile.MotorJoints)
-            {
-                ConfigurableJoint cj    = joint.RagdollJoint;
-                Transform target        = joint.Joint.transform;
-                Rigidbody rb            = cj.transform.GetComponent<Rigidbody>();
-
-                rb.isKinematic = false;
-                rb.freezeRotation = false;
-                cj.targetRotation = PhysAnimUtilities.SetTargetRotation(cj, target.localRotation, joint.StartRotation);
-                cj.slerpDrive = PhysAnimUtilities.ModifyJointDrive(joint.Strength,_profile.Damping);
-            }
         }
 
         private void InitRef()
@@ -100,10 +67,10 @@ namespace PhysAnim
         }
 
         private void OnDisable() {
-            Transform[] transforms = Reference.GetComponentsInChildren<Transform>();
-
             if (!Reference)
                 return;
+            Transform[] transforms = Reference.GetComponentsInChildren<Transform>();
+
             if (Reference.TryGetComponent(out Animator anim))
                 anim.enabled = true;
             foreach (Transform c in transforms)
@@ -135,18 +102,45 @@ namespace PhysAnim
             }
         }
 
+        private void GlobalMatch(Joint j)
+        {
+            if (j.Target && j.RagdollJoint && j.Stiffness != 0.0f )
+            {
+                Rigidbody rb = j.RagdollJoint.gameObject.GetComponent<Rigidbody>();
+                Vector3 desiredVelocity = (j.Target.transform.position - rb.position) / Time.deltaTime;
+                rb.freezeRotation = true;
+                rb.velocity = rb.velocity * (1.0f - j.Stiffness) + desiredVelocity * j.Stiffness;
+                rb.MoveRotation(j.Target.transform.rotation);
+            }
+        }
+
+        private void LocalMatch(Joint j)
+        {
+            j.RagdollJoint.targetRotation = PhysAnimUtilities.SetTargetRotation(j.RagdollJoint,
+                                                                                j.Target.transform.localRotation,
+                                                                                j.StartRotation);
+            j.RagdollJoint.slerpDrive = PhysAnimUtilities.ModifyJointDrive(j.Strength, _profile.Damping);
+        }
+
         private void StateHandler()
         {
-            switch (State)
+            foreach(Joint j in _profile.Joints)
             {
-                case StateRagdoll.Local:
-                    LocalMatch();
-                    break;
-                case StateRagdoll.LocalAndGlobal:
-                    LocalMatch();
-                    GlobalMatch();
-                    break;
+                switch (j.Mode)
+                {
+                    case Mode.Local:
+                        LocalMatch(j);
+                        break;
+                    case Mode.Global:
+                        GlobalMatch(j);
+                        break;
+                    case Mode.Global_and_Local:
+                        // TODO: Mix of both local and global matching
+                        GlobalMatch(j);
+                        break;
+                }
             }
+
         }
 
         private void FixedUpdate()

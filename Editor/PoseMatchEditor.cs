@@ -4,7 +4,6 @@ using UnityEditor;
 
 namespace PhysAnim
 {
-    [Icon("/Editor/Icons/small-physanim.png")]
     [CustomEditor(typeof(PoseMatch))]
     public class PoseMatchEditor : Editor
     {
@@ -17,7 +16,6 @@ namespace PhysAnim
         {
             _poseMatch = (PoseMatch)target;
             _profile = serializedObject.FindProperty("_profile");
-            _state = serializedObject.FindProperty("State");
             _reference = serializedObject.FindProperty("Reference");
         }
 
@@ -27,7 +25,6 @@ namespace PhysAnim
                 return;
             serializedObject.Update();
             EditorGUILayout.PropertyField(_profile);
-            EditorGUILayout.PropertyField(_state);
             EditorGUILayout.PropertyField(_reference);
             serializedObject.ApplyModifiedProperties();
         }
