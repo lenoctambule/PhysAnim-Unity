@@ -31,7 +31,7 @@ namespace PhysAnim
         [Range(0, 1)]
         public float                Stiffness;
         public Transform            Limb;
-        // [NonSerialized]
+        [NonSerialized]
         public Transform            RagdollLimb;
 
         public KeyframedJoint(float Stiffness, Transform Limb)
@@ -42,6 +42,7 @@ namespace PhysAnim
         }
     }
 
+    [AddComponentMenu("PhysAnim/Ragdoll Profile")]
     public class RagdollProfile : MonoBehaviour
     {
         public List<MotorizedJoint> MotorJoints;
@@ -81,7 +82,10 @@ namespace PhysAnim
             return _cached_kjoints[obj];
         }
 
-        public void Enable() {
+        public void Enable()
+        {
+            _cached_mjoints.Clear();
+            _cached_kjoints.Clear();
             InitJoints();
         }
 
@@ -94,7 +98,7 @@ namespace PhysAnim
                 if (j.Joint != null)
                 {
                     Transform ragdoll_joint = PhysAnimUtilities.RecursiveFindChild(ragdoll, j.Joint.transform.name);
-                    if (ragdoll_joint.TryGetComponent<Collider>(out var col))
+                    if (ragdoll_joint.TryGetComponent<Collider>(out Collider col))
                         col.material = RagdollMaterial;
                     j.RagdollJoint = ragdoll_joint.GetComponent<ConfigurableJoint>();
                     j.StartRotation = ragdoll_joint.localRotation;
@@ -108,7 +112,7 @@ namespace PhysAnim
                 else if (j.Limb != null)
                 {
                     Transform ragdoll_limb = PhysAnimUtilities.RecursiveFindChild(PoseMatch.GetRagdoll().transform, j.Limb.transform.name);
-                    if (ragdoll_limb.TryGetComponent<Collider>(out var col))
+                    if (ragdoll_limb.TryGetComponent<Collider>(out Collider col))
                         col.material = RagdollMaterial;
                     j.RagdollLimb = ragdoll_limb.transform;
                     _cached_kjoints[j.Limb.transform] = j;
