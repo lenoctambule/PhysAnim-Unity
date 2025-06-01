@@ -1,3 +1,4 @@
+#if UNITY_EDITOR
 using System;
 using UnityEngine;
 using UnityEditor;
@@ -23,11 +24,6 @@ namespace PhysAnim
             Damping = serializedObject.FindProperty("Damping");
             if (Profile.transform.TryGetComponent(out PoseMatch ps))
                 Profile.PoseMatch = ps;
-            else
-            {
-                Profile.PoseMatch = Profile.gameObject.AddComponent<PoseMatch>();
-                Profile.PoseMatch.Profile = Profile;
-            }
         }
 
         public override void OnInspectorGUI()
@@ -64,3 +60,4 @@ namespace PhysAnim
         }
     }
 }
+#endif

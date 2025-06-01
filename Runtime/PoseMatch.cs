@@ -11,6 +11,7 @@ namespace PhysAnim
         LocalAndGlobal,
     }
 
+    [DisallowMultipleComponent]
     [AddComponentMenu("PhysAnim/Pose Match")]
     public class PoseMatch : MonoBehaviour
     {

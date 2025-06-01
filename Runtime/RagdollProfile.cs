@@ -86,6 +86,8 @@ namespace PhysAnim
         {
             _cached_mjoints.Clear();
             _cached_kjoints.Clear();
+            if (!PoseMatch.GetRagdoll())
+                return;
             InitJoints();
         }
 

@@ -4,39 +4,31 @@ using UnityEditor;
 
 namespace PhysAnim
 {
+    [Icon("/Editor/Icons/small-physanim.png")]
     [CustomEditor(typeof(PoseMatch))]
     public class PoseMatchEditor : Editor
     {
-        SerializedProperty Profile;
-        SerializedProperty State;
-        SerializedProperty Reference;
+        private SerializedProperty _profile;
+        private SerializedProperty _state;
+        private SerializedProperty _reference;
+        private PoseMatch          _poseMatch;
 
         private void OnEnable()
         {
-            PoseMatch poseMatch = (PoseMatch)target;
-
-            Profile = serializedObject.FindProperty("_profile");
-            State = serializedObject.FindProperty("State");
-            Reference = serializedObject.FindProperty("Reference");
-
-            PoseMatch[] l = poseMatch.transform.GetComponentsInChildren<PoseMatch>();
-            if (l.Length > 1)
-            {
-                EditorUtility.DisplayDialog("The component PoseMatch can't be added because" + poseMatch.gameObject + "already contains the same component.", "Cancel" ,"");
-                DestroyImmediate(poseMatch);
-            }
+            _poseMatch = (PoseMatch)target;
+            _profile = serializedObject.FindProperty("_profile");
+            _state = serializedObject.FindProperty("State");
+            _reference = serializedObject.FindProperty("Reference");
         }
 
         public override void OnInspectorGUI()
         {
-            PoseMatch poseMatch = (PoseMatch)target;
-
-            if (poseMatch == null)
+            if (_poseMatch == null)
                 return;
             serializedObject.Update();
-            EditorGUILayout.PropertyField(Profile);
-            EditorGUILayout.PropertyField(State);
-            EditorGUILayout.PropertyField(Reference);
+            EditorGUILayout.PropertyField(_profile);
+            EditorGUILayout.PropertyField(_state);
+            EditorGUILayout.PropertyField(_reference);
             serializedObject.ApplyModifiedProperties();
         }
     }
