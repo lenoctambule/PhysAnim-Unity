@@ -13,9 +13,15 @@ namespace PhysAnim
 
         private void OnEnable()
         {
+            PoseMatch poseMatch = (PoseMatch)target;
+
             Profile = serializedObject.FindProperty("Profile");
             State = serializedObject.FindProperty("State");
             Reference = serializedObject.FindProperty("Reference");
+
+            PoseMatch[] l = poseMatch.transform.GetComponentsInChildren<PoseMatch>();
+            if (l.Length > 1)
+                DestroyImmediate(poseMatch);
         }
 
         public override void OnInspectorGUI()
@@ -27,6 +33,7 @@ namespace PhysAnim
             serializedObject.Update();
             EditorGUILayout.PropertyField(Profile);
             EditorGUILayout.PropertyField(State);
+            EditorGUILayout.PropertyField(Reference);
             serializedObject.ApplyModifiedProperties();
         }
     }

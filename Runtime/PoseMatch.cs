@@ -7,8 +7,8 @@ namespace PhysAnim
 {
     public enum StateRagdoll
     {
-        Ragdolling,
-        PartiallyKeyFramed,
+        Local,
+        LocalAndGlobal,
     }
 
     public class PoseMatch : MonoBehaviour
@@ -24,7 +24,7 @@ namespace PhysAnim
             return _ragdoll;
         }
 
-        private void PartialRefMatch()
+        private void GlobalMatch()
         {
             foreach (KeyframedJoint j in  Profile.KeyFramedJoints)
             {
@@ -41,7 +41,7 @@ namespace PhysAnim
             }
         }
 
-        private void MotorMatch()
+        private void LocalMatch()
         {
             foreach (MotorizedJoint joint in Profile.MotorJoints)
             {
@@ -52,28 +52,19 @@ namespace PhysAnim
                 rb.isKinematic = false;
                 rb.freezeRotation = false;
                 cj.targetRotation = PhysAnimUtilities.SetTargetRotation(cj, target.localRotation, joint.StartRotation);
-                cj.slerpDrive = PhysAnimUtilities.ModifyJointDrive(
-                    joint.Strength,
-                    Profile.Damping);
+                cj.slerpDrive = PhysAnimUtilities.ModifyJointDrive(joint.Strength,Profile.Damping);
             }
         }
 
         private void InitRef()
         {
-            Animator    anim;
-            Transform[] ref_transforms = Reference.GetComponentsInChildren<Transform>();
-
             if (Reference == null)
                 throw new ArgumentException("No reference provided");
             _ragdoll = Instantiate(Reference, Reference.transform.position, Reference.transform.rotation);
             _ragdoll.transform.SetParent(Reference.transform.parent);
             _ragdoll.transform.position = Reference.transform.position;
             _ragdoll.name = Reference.name + "_ragdoll";
-            if (Reference.TryGetComponent(out anim))
-                anim.enabled = true;
-            if (_ragdoll.TryGetComponent(out anim))
-                anim.enabled = false;
-            foreach (Transform c in ref_transforms)
+            foreach (Transform c in Reference.GetComponentsInChildren<Transform>())
             {
                 if (c.gameObject.TryGetComponent(out SkinnedMeshRenderer smr))
                     smr.enabled = false;
@@ -82,6 +73,8 @@ namespace PhysAnim
                 if (c.gameObject.TryGetComponent(out Rigidbody rb))
                     rb.isKinematic = true;
             }
+            foreach (Rigidbody rb in _ragdoll.GetComponentsInChildren<Rigidbody>())
+                rb.isKinematic = false;
         }
 
         private void OnEnable()
@@ -95,18 +88,22 @@ namespace PhysAnim
             }
             else
                 Debug.LogError(this + ": Reference is unassigned.");
-
         }
 
         private void OnDisable() {
+            Transform[] transforms = Reference.GetComponentsInChildren<Transform>();
+
             if (!Reference)
                 return;
-            Collider[] ref_colliders = Reference.GetComponentsInChildren<Collider>();
-            SkinnedMeshRenderer[] ref_renderers = Reference.GetComponentsInChildren<SkinnedMeshRenderer>();
-            foreach (Collider c in ref_colliders)
-                c.enabled = true;
-            foreach (SkinnedMeshRenderer r in ref_renderers)
-                r.enabled = true;
+            if (Reference.TryGetComponent(out Animator anim))
+                anim.enabled = true;
+            foreach (Transform c in transforms)
+            {
+                if (c.gameObject.TryGetComponent(out SkinnedMeshRenderer smr))
+                    smr.enabled = true;
+                if (c.gameObject.TryGetComponent(out Collider coll))
+                    coll.enabled = true;
+            }
             Destroy(_ragdoll);
         }
 
@@ -127,12 +124,12 @@ namespace PhysAnim
         {
             switch (State)
             {
-                case StateRagdoll.Ragdolling:
-                    MotorMatch();
+                case StateRagdoll.Local:
+                    LocalMatch();
                     break;
-                case StateRagdoll.PartiallyKeyFramed:
-                    MotorMatch();
-                    PartialRefMatch();
+                case StateRagdoll.LocalAndGlobal:
+                    LocalMatch();
+                    GlobalMatch();
                     break;
             }
         }
