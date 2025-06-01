@@ -42,7 +42,6 @@ namespace PhysAnim
         public List<Joint>          Joints = new();
         public PhysicMaterial       RagdollMaterial;
         public float                Damping;
-        public PoseMatch            PoseMatch;
 
         private Dictionary<Transform, Joint> _cached_joints = new();
 
@@ -61,17 +60,12 @@ namespace PhysAnim
             return _cached_joints[obj];
         }
 
-        public void Enable()
+        public void Enable(PoseMatch ps)
         {
             _cached_joints.Clear();
-            if (!PoseMatch.GetRagdoll())
+            if (!ps.GetRagdoll())
                 return;
-            InitJoints();
-        }
-
-        private void InitJoints()
-        {
-            Transform ragdoll = PoseMatch.GetRagdoll().transform;
+            Transform ragdoll = ps.GetRagdoll().transform;
 
             foreach (Joint j in Joints)
             {

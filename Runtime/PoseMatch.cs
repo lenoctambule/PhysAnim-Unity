@@ -27,8 +27,7 @@ namespace PhysAnim
             get => _profile;
             set { 
                 _profile = value;
-                _profile.PoseMatch = this;
-                _profile.Enable();
+                _profile.Enable(this);
             }
         }
 
@@ -64,7 +63,7 @@ namespace PhysAnim
             if (Reference)
             {
                 InitRef();
-                _profile.Enable();
+                _profile.Enable(this);
             }
             else
                 Debug.LogError(this + ": Reference is unassigned.");
@@ -101,9 +100,8 @@ namespace PhysAnim
             if (_track_profile != Profile)
             {
                 _track_profile = Profile;
-                Profile.PoseMatch = this;
                 if (_ragdoll)
-                    Profile.Enable();
+                    Profile.Enable(this);
             }
         }
 
@@ -121,6 +119,9 @@ namespace PhysAnim
 
         private void LocalMatch(Joint j)
         {
+            Rigidbody rb = j.RagdollJoint.gameObject.GetComponent<Rigidbody>();
+            
+            rb.freezeRotation = false;
             j.RagdollJoint.targetRotation = PhysAnimUtilities.SetTargetRotation(j.RagdollJoint,
                                                                                 j.Target.transform.localRotation,
                                                                                 j.StartRotation);
