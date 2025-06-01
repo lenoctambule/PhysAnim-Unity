@@ -15,13 +15,16 @@ namespace PhysAnim
         {
             PoseMatch poseMatch = (PoseMatch)target;
 
-            Profile = serializedObject.FindProperty("Profile");
+            Profile = serializedObject.FindProperty("_profile");
             State = serializedObject.FindProperty("State");
             Reference = serializedObject.FindProperty("Reference");
 
             PoseMatch[] l = poseMatch.transform.GetComponentsInChildren<PoseMatch>();
             if (l.Length > 1)
+            {
+                EditorUtility.DisplayDialog("The component PoseMatch can't be added because" + poseMatch.gameObject + "already contains the same component.", "Cancel" ,"");
                 DestroyImmediate(poseMatch);
+            }
         }
 
         public override void OnInspectorGUI()

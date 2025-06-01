@@ -14,12 +14,19 @@ namespace PhysAnim
     [AddComponentMenu("PhysAnim/Pose Match")]
     public class PoseMatch : MonoBehaviour
     {
-
         public StateRagdoll State;
-        [SerializeField]
-        public RagdollProfile Profile;
         public GameObject Reference;
+
         private GameObject _ragdoll;
+        [SerializeField]
+        private RagdollProfile _profile;
+        private RagdollProfile _track_profile;
+
+        public RagdollProfile Profile
+        {
+            get => _profile;
+            set { (_profile = value).Enable(); }
+        }
 
         public GameObject GetRagdoll() {
             return _ragdoll;
@@ -27,7 +34,7 @@ namespace PhysAnim
 
         private void GlobalMatch()
         {
-            foreach (KeyframedJoint j in  Profile.KeyFramedJoints)
+            foreach (KeyframedJoint j in  _profile.KeyFramedJoints)
             {
                 if (j.Limb && j.RagdollLimb && j.Stiffness != 0.0f )
                 {
@@ -44,7 +51,7 @@ namespace PhysAnim
 
         private void LocalMatch()
         {
-            foreach (MotorizedJoint joint in Profile.MotorJoints)
+            foreach (MotorizedJoint joint in _profile.MotorJoints)
             {
                 ConfigurableJoint cj    = joint.RagdollJoint;
                 Transform target        = joint.Joint.transform;
@@ -53,7 +60,7 @@ namespace PhysAnim
                 rb.isKinematic = false;
                 rb.freezeRotation = false;
                 cj.targetRotation = PhysAnimUtilities.SetTargetRotation(cj, target.localRotation, joint.StartRotation);
-                cj.slerpDrive = PhysAnimUtilities.ModifyJointDrive(joint.Strength,Profile.Damping);
+                cj.slerpDrive = PhysAnimUtilities.ModifyJointDrive(joint.Strength,_profile.Damping);
             }
         }
 
@@ -64,7 +71,7 @@ namespace PhysAnim
             _ragdoll = Instantiate(Reference, Reference.transform.position, Reference.transform.rotation);
             _ragdoll.transform.SetParent(Reference.transform.parent);
             _ragdoll.transform.position = Reference.transform.position;
-            _ragdoll.name = Reference.name + "_ragdoll";
+            _ragdoll.name = "[ragdoll]" + Reference.name;
             foreach (Transform c in Reference.GetComponentsInChildren<Transform>())
             {
                 if (c.gameObject.TryGetComponent(out SkinnedMeshRenderer smr))
@@ -85,7 +92,7 @@ namespace PhysAnim
             if (Reference)
             {
                 InitRef();
-                Profile.Enable();
+                _profile.Enable();
             }
             else
                 Debug.LogError(this + ": Reference is unassigned.");
@@ -118,6 +125,12 @@ namespace PhysAnim
                     Debug.LogError("Reference can't be self or one of parents.");
                     break;
                 }
+            }
+            if (_track_profile != Profile)
+            {
+                _track_profile = Profile;
+                if (_ragdoll)
+                    Profile.Enable();
             }
         }
 
