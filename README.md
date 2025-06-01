@@ -1,48 +1,57 @@
 <div align="center">
-<img 
+  <img 
     src="Media~/logo-light.png" 
     alt="Logo"
     height="200px">
-
-</img>
 </div>
+
 <h2 align="center">
-PhysAnim For Unity
+  PhysAnim for Unity
 </h2>
 
-PhysAnim is a Unity tool that enables physical animations through motor-based and keyframe-based ragdoll pose matching.
+**PhysAnim** is a Unity tool that enables physical animation through motor-based and keyframe-based ragdoll pose matching.
 
 <div align="center">
-<img 
+  <img 
     src="Media~/ragdoll.gif" 
     alt="Ragdoll gif">
-</img>
 </div>
+
+---
 
 ## Quickstart Guide
 
 ### Installation
 
-To add package to your project, you need to : 
-1. Open the Unity Package Manager (via Window > Package Manager) 
-2. You can then click "Add Package from Git URL" and copy the [url of this repository](https://github.com/lenoctambule/PhysAnim-Unity.git).
+To add the package to your project:
+
+1. Open the Unity Package Manager (`Window > Package Manager`).
+2. Click **"Add package from Git URL"**, then paste the following repository URL:  
+   [https://github.com/lenoctambule/PhysAnim-Unity.git](https://github.com/lenoctambule/PhysAnim-Unity.git)
+
+---
 
 ### Usage
 
-:warning: First, you have to make sure that your animator's culling mode is set to "Always animate" and the update mode to animate physics.
+⚠ **Important**: Set your Animator’s **Culling Mode** to **"Always Animate"** and **Update Mode** to **"Animate Physics"**.
 
-1. Add Pose Match script component (via Add component > Scripts > PhysAnim > Pose Match) in any Game Object that is not one of the parents nor the object that you wish to physically animate.
-2. Assign into reference field the root of the ragdoll you want to animate.
-3. Hit "Auto-detect and add character joints" button to add all the joints to the Motor and Keyframed joints lists or/and add them manually.
-4. Tweak the settings to your liking.
+1. Add the **Pose Match** component (via `Add Component > PhysAnim > Pose Match`) to any GameObject that is **not** a parent of, or the object you want to physically animate.
+2. Assign the root of the ragdoll to the **reference field**.
+3. Add a **Ragdoll Profile** component (via `Add Component > PhysAnim > Ragdoll Profile`). If the **Pose Match** field isn't auto-filled, set it to the one you just created.
+4. If your joints are **Character Joints**, you can convert them using the **"Convert Character Joints to Configurable Joints"** button.
+5. Use **"Auto-detect and add character joints"** to populate the joint list, or add them manually.
+6. Tweak the settings to your liking.
 
-There are 2 modes :
+There are three modes:
 
-- **Ragdolling** which will match poses only using the motor-driven joints
-- **Partially keyframed** which will mix both motor-driven and keyframed driven.
+- **Local** – Matches joint rotations locally using motor constraints.
+- **Global** – Matches global positions and rotations using interpolation.
+- **Global and Local** – Combines both approaches. :construction_worker: *(Under development)*
+
+---
 
 ## Acknowledgments
 
-- Michal Mach's GDC Talk : [Physics Animation in Uncharted 4: A Thief's End](https://www.youtube.com/watch?v=7S-_vuoKgR4)
-- Bartlomiej Waszak's GDC Talk : [Physical Animation in Star Wars Jedi: Fallen Order](https://www.youtube.com/watch?v=TmAU8aPekEo)
-- Michael Stevenson : For [ConfigurableJointsExtensions.cs](https://gist.github.com/mstevenson/7b85893e8caf5ca034e6)
+- [Michal Mach – *Physics Animation in Uncharted 4: A Thief's End (GDC Talk)*](https://www.youtube.com/watch?v=7S-_vuoKgR4)  
+- [Bartłomiej Waszak – *Physical Animation in Star Wars Jedi: Fallen Order (GDC Talk)*](https://www.youtube.com/watch?v=TmAU8aPekEo)  
+- Michael Stevenson – for [ConfigurableJointsExtensions.cs](https://gist.github.com/mstevenson/7b85893e8caf5ca034e6)
