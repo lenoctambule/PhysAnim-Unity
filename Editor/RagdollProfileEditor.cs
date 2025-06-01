@@ -34,21 +34,27 @@ namespace PhysAnim
             {
                 if (ps.Reference == null)
                     Debug.LogError("Character joints can't be detected because the Reference's Root is not defined");
-                CharacterJoint[] char_joints = ps.Reference.transform.GetComponentsInChildren<CharacterJoint>();
-                foreach (CharacterJoint cj in char_joints)
+                else
                 {
-                    ConfigurableJoint new_j = PhysAnimUtilities.RecursiveFindChild(ps.Reference.transform, cj.name).gameObject.AddComponent<ConfigurableJoint>();
-                    PhysAnimUtilities.ConvertCharJointToConfigurableJoint(cj, ref new_j);
-                    DestroyImmediate(cj);
+                    CharacterJoint[] char_joints = ps.Reference.transform.GetComponentsInChildren<CharacterJoint>();
+                    foreach (CharacterJoint cj in char_joints)
+                    {
+                        ConfigurableJoint new_j = PhysAnimUtilities.RecursiveFindChild(ps.Reference.transform, cj.name).gameObject.AddComponent<ConfigurableJoint>();
+                        PhysAnimUtilities.ConvertCharJointToConfigurableJoint(cj, ref new_j);
+                        DestroyImmediate(cj);
+                    }
                 }
             }
             if (GUILayout.Button("Auto-add joints"))
             {
                 if (ps.Reference == null)
-                    Debug.LogError("Character joints can't be detected because the Reference's Root is not defined");
-                ConfigurableJoint[] joints = ps.Reference.transform.GetComponentsInChildren<ConfigurableJoint>();
-                foreach (ConfigurableJoint j in joints)
-                    _profile.Add(new Joint(j));
+                    Debug.LogError("Joints can't be detected because the Reference's Root is not defined");
+                else
+                {
+                    ConfigurableJoint[] joints = ps.Reference.transform.GetComponentsInChildren<ConfigurableJoint>();
+                    foreach (ConfigurableJoint j in joints)
+                        _profile.Add(new Joint(j));
+                }
             }
             GUI.enabled = true;
             EditorGUILayout.PropertyField(_damping);
