@@ -25,7 +25,11 @@ namespace PhysAnim
         public RagdollProfile Profile
         {
             get => _profile;
-            set { (_profile = value).Enable(); }
+            set { 
+                _profile = value;
+                _profile.PoseMatch = this;
+                _profile.Enable();
+            }
         }
 
         public GameObject GetRagdoll() {
@@ -97,6 +101,7 @@ namespace PhysAnim
             if (_track_profile != Profile)
             {
                 _track_profile = Profile;
+                Profile.PoseMatch = this;
                 if (_ragdoll)
                     Profile.Enable();
             }

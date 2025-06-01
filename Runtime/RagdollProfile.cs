@@ -39,7 +39,7 @@ namespace PhysAnim
     [AddComponentMenu("PhysAnim/Ragdoll Profile")]
     public class RagdollProfile : MonoBehaviour
     {
-        public List<Joint>          Joints;
+        public List<Joint>          Joints = new();
         public PhysicMaterial       RagdollMaterial;
         public float                Damping;
         public PoseMatch            PoseMatch;
